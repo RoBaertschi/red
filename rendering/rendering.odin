@@ -129,18 +129,6 @@ rectangle :: proc(r: ^Renderer, pos: [2]f32, size: [2]f32, color: [4]f32) {
     }
 
     append(&r.indices, ..i[:])
-
-    // triangle(r, {
-    //     {pos.x, pos.y, 0}, // Top left
-    //     {pos.x + size.x, pos.y, 0}, // Top right
-    //     {pos.x, pos.y + size.y, 0}, // Bottom left
-    // }, color)
-    //
-    // triangle(r, {
-    //     {pos.x + size.x, pos.y, 0}, // Top right
-    //     {pos.x, pos.y + size.y, 0}, // Bottom left
-    //     {pos.x + size.x, pos.y + size.y, 0}, // Bottom right
-    // }, color)
 }
 
 @(private)
