@@ -51,12 +51,17 @@ setup :: proc(desc: Desc) -> (trs: Text_Rendering_State) {
 	return
 }
 
-text_bounds :: proc(trs: ^Text_Rendering_State, text: string, pos: [2]f32 = {0, 0}, bounds: ^[4]f32 = nil) -> f32 {
-    return fs.TextBounds(trs.fc, text, pos.x, pos.y, bounds)
+text_bounds :: proc(
+	trs: ^Text_Rendering_State,
+	text: string,
+	pos: [2]f32 = {0, 0},
+	bounds: ^[4]f32 = nil,
+) -> f32 {
+	return fs.TextBounds(trs.fc, text, pos.x, pos.y, bounds)
 }
 
 vertical_metrics :: proc(trs: ^Text_Rendering_State) -> (ascender, descender, line_height: f32) {
-    return fs.VerticalMetrics(trs.fc)
+	return fs.VerticalMetrics(trs.fc)
 }
 
 draw_text :: proc(
@@ -92,9 +97,9 @@ draw_text :: proc(
 }
 
 draw :: proc(trs: ^Text_Rendering_State, width, height: int) {
-    if len(trs.renderer.vertices) <= 0 {
-        return
-    }
+	if len(trs.renderer.vertices) <= 0 {
+		return
+	}
 
 	if int(sg.query_image_width(trs.renderer.texture)) != trs.fc.width ||
 	   int(sg.query_image_height(trs.renderer.texture)) != trs.fc.height {
@@ -147,7 +152,7 @@ text_renderer_init :: proc(tr: ^Text_Renderer, fc: ^fs.FontContext, width, heigh
 	tr.fc = fc
 	text_renderer_create_texture(tr, width, height)
 	tr.buffer = sg.make_buffer({usage = .DYNAMIC, size = BUFFER_SIZE * size_of(Vertex)})
-    tr.current_buffer_size = BUFFER_SIZE
+	tr.current_buffer_size = BUFFER_SIZE
 	tr.shd = sg.make_shader(shaders.text_shader_desc(sg.query_backend()))
 	tr.smp = sg.make_sampler({min_filter = .NEAREST, mag_filter = .NEAREST})
 
@@ -234,7 +239,7 @@ text_renderer_push_vertices :: proc(tr: ^Text_Renderer, size: int) -> []Vertex {
 
 text_renderer_draw_quad :: proc(tr: ^Text_Renderer, color: [3]f32, q: fs.Quad) {
 	// v := text_renderer_push_vertices(tr, 6)
-  v := [6]Vertex{}
+	v := [6]Vertex{}
 	v[0].texcoord = {q.s0, q.t0}
 	v[1].texcoord = {q.s1, q.t0}
 	v[2].texcoord = {q.s0, q.t1}
@@ -252,20 +257,25 @@ text_renderer_draw_quad :: proc(tr: ^Text_Renderer, color: [3]f32, q: fs.Quad) {
 		v.color = color
 	}
 
-  append(&tr.vertices, ..v[:])
+	append(&tr.vertices, ..v[:])
 }
 
 text_renderer_update_buffer :: proc(tr: ^Text_Renderer) {
-  if tr.current_buffer_size < len(tr.vertices) {
-    sg.destroy_buffer(tr.buffer)
-    for tr.current_buffer_size < len(tr.vertices) {
-      tr.current_buffer_size *= 2
-    }
-    tr.buffer = sg.make_buffer({usage = .DYNAMIC, size = tr.current_buffer_size * size_of(Vertex)})
-    tr.bnd.vertex_buffers[0] = tr.buffer
-  }
+	if tr.current_buffer_size < len(tr.vertices) {
+		sg.destroy_buffer(tr.buffer)
+		for tr.current_buffer_size < len(tr.vertices) {
+			tr.current_buffer_size *= 2
+		}
+		tr.buffer = sg.make_buffer(
+			{usage = .DYNAMIC, size = tr.current_buffer_size * size_of(Vertex)},
+		)
+		tr.bnd.vertex_buffers[0] = tr.buffer
+	}
 
-	sg.update_buffer(tr.buffer, {size = len(tr.vertices) * size_of(Vertex), ptr = raw_data(tr.vertices)})
+	sg.update_buffer(
+		tr.buffer,
+		{size = len(tr.vertices) * size_of(Vertex), ptr = raw_data(tr.vertices)},
+	)
 }
 
 text_renderer_draw :: proc(tr: ^Text_Renderer) {
